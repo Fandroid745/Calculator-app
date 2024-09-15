@@ -1,8 +1,3 @@
 <resources>
-    <string name="Full_name">Dhanush Sugganahalli</string>
-    <string name="talent" >Android Developer Extraodinaire</string>
-    <string name="phone_no">+100</string>
-    <string name="social_media">\@AndroidDev</string>
-    <string name="email">isheepolice69@android.com</string>
-
+    <string name="Full_name">Calculator app</string>
 </resources>
