@@ -21,7 +21,7 @@
                 is CalculatorActions.Operations -> enterOperations(action.operation)
                 is CalculatorActions.Calculate -> performCalculation()
                 is CalculatorActions.Delete -> performDeletion()
-                is CalculatorActions.ToggleParentheses -> toggleParentheses()
+                is CalculatorActions.Parentheses -> toggleParentheses()
                 else -> return
 
             }

@@ -1,32 +1,15 @@
 package com.example.calculator20
 
-import android.annotation.SuppressLint
 import android.os.Bundle
-import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
-//import androidx.compose.foundation.layout.BoxScopeInstance.align
-//import androidx.compose.foundation.layout.FlowColumnScopeInstance.align
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,7 +17,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,7 +37,6 @@ class MainActivity : ComponentActivity() {
                 val state = viewModel.state
                 val buttonSpacing = 8.dp
 
-                // Call the Calculator composable here
                 Calculator(
                     state = state,
                     buttonSpacing = buttonSpacing,
@@ -69,10 +50,9 @@ class MainActivity : ComponentActivity() {
     fun Calculator(
         state: CalculatorStates,
         modifier: Modifier = Modifier,
-        buttonSpacing: Dp = (8.dp),
+        buttonSpacing: Dp = 8.dp,
         onAction: (CalculatorActions) -> Unit
     ) {
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -85,237 +65,195 @@ class MainActivity : ComponentActivity() {
                     .align(Alignment.BottomCenter),
                 verticalArrangement = Arrangement.spacedBy(buttonSpacing)
             ) {
+                // Display Screen
                 Text(
                     text = state.number1 + (state.operation?.symbol ?: "") + state.number2,
                     textAlign = TextAlign.End,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 32.dp),
-                    fontSize = 80.sp,
+                    fontSize = 36.sp,
                     color = Color.White,
                     maxLines = 2
                 )
 
-                // First Row: AC, DEL, ^, /
+                // Additional Buttons Row: √, π, ^, !
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(buttonSpacing)
                 ) {
-                    CalculatorButton(
-                        symbol = "AC",
-                        modifier = Modifier
-                            .background(LightGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Clear) }
-                    )
-                    CalculatorButton(
-                        symbol = "Del",
-                        modifier = Modifier
-                            .background(LightGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Delete) }
-                    )
-                  CalculatorButton(
-                        symbol = "/",
-                        modifier = Modifier
-                            .background(Blue)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Operations(CalculatorOperations.Divide)) }
-                    )
+                    CalculatorButton("√", LightGray, Modifier.weight(1f), isShaped = false) {
+                        onAction(CalculatorActions.Operations(CalculatorOperations.SquareRoot))
+                    }
+                    CalculatorButton("π", LightGray, Modifier.weight(1f), isShaped = false) {
+                        onAction(CalculatorActions.Pi)
+                    }
+                    CalculatorButton("^", LightGray, Modifier.weight(1f), isShaped = false) {
+                        onAction(CalculatorActions.Operations(CalculatorOperations.Power))
+                    }
+                    CalculatorButton("!", LightGray, Modifier.weight(1f), isShaped = false) {
+                        onAction(CalculatorActions.Operations(CalculatorOperations.Factorial))
+                    }
                 }
 
-                // Second Row: ( , ) , Pi, √, x^Y, !
+                // Top Row: AC, Del, %, ÷
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(buttonSpacing)
                 ) {
-
+                    CalculatorButton("AC", LightGray, Modifier.weight(1f)) {
+                        onAction(
+                            CalculatorActions.Clear
+                        )
+                    }
+                    CalculatorButton("Del", LightGray, Modifier.weight(1f)) {
+                        onAction(
+                            CalculatorActions.Delete
+                        )
+                    }
+                    CalculatorButton("%", LightGray, Modifier.weight(1f)) {
+                        onAction(
+                            CalculatorActions.Percentage
+                        )
+                    }
                     CalculatorButton(
-                        symbol = "π",
-                        modifier = Modifier
-                            .background(LightGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Operations(CalculatorOperations.PI)) }
-                    )
-                    CalculatorButton(
-                        symbol = "√",
-                        modifier = Modifier
-                            .background(LightGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Operations(CalculatorOperations.SquareRoot)) }
-                    )
-                    CalculatorButton(
-                        symbol = "^",
-                        modifier = Modifier
-                            .background(Blue)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Operations(CalculatorOperations.Power)) }
-                    )
-                    CalculatorButton(
-                        symbol = "!",
-                        modifier = Modifier
-                            .background(LightGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Operations(CalculatorOperations.Factorial)) }
-                    )
+                        "÷",
+                        Blue,
+                        Modifier.weight(1f)
+                    ) { onAction(CalculatorActions.Operations(CalculatorOperations.Divide)) }
                 }
 
-
+                // Second Row: 7, 8, 9, ×
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(buttonSpacing)
                 ) {
+                    CalculatorButton("7", MediumGray, Modifier.weight(1f)) {
+                        onAction(
+                            CalculatorActions.Number(7)
+                        )
+                    }
+                    CalculatorButton("8", MediumGray, Modifier.weight(1f)) {
+                        onAction(
+                            CalculatorActions.Number(8)
+                        )
+                    }
+                    CalculatorButton("9", MediumGray, Modifier.weight(1f)) {
+                        onAction(
+                            CalculatorActions.Number(9)
+                        )
+                    }
                     CalculatorButton(
-                        symbol = "7",
-                        modifier = Modifier
-                            .background(MediumGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Number(7)) }
-                    )
-                    CalculatorButton(
-                        symbol = "8",
-                        modifier = Modifier
-                            .background(MediumGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Number(8)) }
-                    )
-                    CalculatorButton(
-                        symbol = "9",
-                        modifier = Modifier
-                            .background(MediumGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Number(9)) }
-                    )
-                    CalculatorButton(
-                        symbol = "X",
-                        modifier = Modifier
-                            .background(Blue)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Operations(CalculatorOperations.Multiply)) }
-                    )
+                        "×",
+                        Blue,
+                        Modifier.weight(1f)
+                    ) { onAction(CalculatorActions.Operations(CalculatorOperations.Multiply)) }
                 }
 
-
+                // Third Row: 4, 5, 6, -
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(buttonSpacing)
                 ) {
+                    CalculatorButton("4", MediumGray, Modifier.weight(1f)) {
+                        onAction(
+                            CalculatorActions.Number(4)
+                        )
+                    }
+                    CalculatorButton("5", MediumGray, Modifier.weight(1f)) {
+                        onAction(
+                            CalculatorActions.Number(5)
+                        )
+                    }
+                    CalculatorButton("6", MediumGray, Modifier.weight(1f)) {
+                        onAction(
+                            CalculatorActions.Number(6)
+                        )
+                    }
                     CalculatorButton(
-                        symbol = "4",
-                        modifier = Modifier
-                            .background(MediumGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Number(4)) }
-                    )
-                    CalculatorButton(
-                        symbol = "5",
-                        modifier = Modifier
-                            .background(MediumGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Number(5)) }
-                    )
-                    CalculatorButton(
-                        symbol = "6",
-                        modifier = Modifier
-                            .background(MediumGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Number(6)) }
-                    )
-                    CalculatorButton(
-                        symbol = "-",
-                        modifier = Modifier
-                            .background(Blue)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Operations(CalculatorOperations.Subtract)) }
-                    )
+                        "-",
+                        Blue,
+                        Modifier.weight(1f)
+                    ) { onAction(CalculatorActions.Operations(CalculatorOperations.Subtract)) }
                 }
 
-
+                // Fourth Row: 1, 2, 3, +
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(buttonSpacing)
                 ) {
+                    CalculatorButton("1", MediumGray, Modifier.weight(1f)) {
+                        onAction(
+                            CalculatorActions.Number(1)
+                        )
+                    }
+                    CalculatorButton("2", MediumGray, Modifier.weight(1f)) {
+                        onAction(
+                            CalculatorActions.Number(2)
+                        )
+                    }
+                    CalculatorButton("3", MediumGray, Modifier.weight(1f)) {
+                        onAction(
+                            CalculatorActions.Number(3)
+                        )
+                    }
                     CalculatorButton(
-                        symbol = "1",
-                        modifier = Modifier
-                            .background(MediumGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Number(1)) }
-                    )
-                    CalculatorButton(
-                        symbol = "2",
-                        modifier = Modifier
-                            .background(MediumGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Number(2)) }
-                    )
-                    CalculatorButton(
-                        symbol = "3",
-                        modifier = Modifier
-                            .background(MediumGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Number(3)) }
-                    )
-                    CalculatorButton(
-                        symbol = "+",
-                        modifier = Modifier
-                            .background(Blue)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Operations(CalculatorOperations.Add)) }
-                    )
+                        "+",
+                        Blue,
+                        Modifier.weight(1f)
+                    ) { onAction(CalculatorActions.Operations(CalculatorOperations.Add)) }
                 }
 
-                // Last Row: 0, ., =
+                // Bottom Row: 0, ., =
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(buttonSpacing)
                 ) {
+                    CalculatorButton("0", MediumGray, Modifier.weight(1f) ,isSmall=true) {
+                        onAction(
+                            CalculatorActions.Number(0)
+                        )
+                    }
+                    CalculatorButton(".", MediumGray, Modifier.weight(1f),isSmall=true) {
+                        onAction(
+                            CalculatorActions.Decimal
+                        )
+                    }
                     CalculatorButton(
-                        symbol = "0",
-                        modifier = Modifier
-                            .background(MediumGray)
-                            .aspectRatio(2f)
-                            .weight(2f),
-                        onClick = { onAction(CalculatorActions.Number(0)) }
-                    )
-                    CalculatorButton(
-                        symbol = ".",
-                        modifier = Modifier
-                            .background(MediumGray)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Decimal) }
-                    )
-                    CalculatorButton(
-                        symbol = "=",
-                        modifier = Modifier
-                            .background(Blue)
-                            .aspectRatio(1f)
-                            .weight(1f),
-                        onClick = { onAction(CalculatorActions.Calculate) }
-                    )
+                        "=",
+                        Blue,
+                        Modifier.weight(1f),
+                        isSmall=true
+                    ) { onAction(CalculatorActions.Calculate) }
                 }
             }
         }
     }
 
+    @Composable
+    fun CalculatorButton(
+        symbol: String,
+        color: Color,
+        modifier: Modifier = Modifier,
+        isShaped: Boolean = true,
+        isSmall:Boolean=false,
+        onClick: () -> Unit
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = modifier
+                .aspectRatio(if(isSmall)1.5f else 1f )
+                .clip(if (isShaped) CircleShape else MaterialTheme.shapes.medium)
+                .background(color)
+                .clickable { onClick() }
+        ) {
+            Text(
+                text = symbol,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
 }

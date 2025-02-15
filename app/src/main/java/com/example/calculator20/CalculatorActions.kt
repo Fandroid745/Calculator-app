@@ -6,13 +6,16 @@ sealed class CalculatorActions {
     object Delete:CalculatorActions()
 
 
-    object ToggleParnetheses : CalculatorActions()
+    object Parentheses : CalculatorActions()
     object Decimal:CalculatorActions()
     object Calculate:CalculatorActions()
 
-    object ToggleParentheses:CalculatorActions()
+
 
     object Pi: CalculatorActions()
+    object Percentage : CalculatorActions() {
+
+    }
 
     data class Operations(val operation:CalculatorOperations):CalculatorActions()
 }
