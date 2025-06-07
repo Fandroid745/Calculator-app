@@ -1,22 +1,30 @@
 package com.example.calculator20
 
+import CalculatorViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,7 +32,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.calculator20.ui.theme.Blue
 import com.example.calculator20.ui.theme.Calculator20Theme
 import com.example.calculator20.ui.theme.CalculatorStates
-import com.example.calculator20.ui.theme.LightGray
 import com.example.calculator20.ui.theme.MediumGray
 
 class MainActivity : ComponentActivity() {
@@ -34,21 +41,23 @@ class MainActivity : ComponentActivity() {
         setContent {
             Calculator20Theme {
                 val viewModel = viewModel<CalculatorViewModel>()
-                val state = viewModel.state
+                val state = viewModel.stateFlow.collectAsState()
                 val buttonSpacing = 8.dp
 
                 Calculator(
                     state = state,
-                    buttonSpacing = buttonSpacing,
-                    onAction = { action -> viewModel.onAction(action) }
-                )
+                    buttonSpacing = buttonSpacing
+                ) { action ->
+                    println("Button onclicked :$action")
+                    viewModel.onAction(action)
+                }
             }
         }
     }
 
     @Composable
     fun Calculator(
-        state: CalculatorStates,
+        state: State<CalculatorStates>,
         modifier: Modifier = Modifier,
         buttonSpacing: Dp = 8.dp,
         onAction: (CalculatorActions) -> Unit
@@ -65,16 +74,30 @@ class MainActivity : ComponentActivity() {
                     .align(Alignment.BottomCenter),
                 verticalArrangement = Arrangement.spacedBy(buttonSpacing)
             ) {
+
+                Text(
+                    text = "${state.value.number.joinToString(" ")} ${state.value.operations.joinToString(" ") { it.symbol }}",
+                    fontSize = 20.sp,
+                    color = Color.LightGray,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    textAlign = TextAlign.End,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
                 // Display Screen
                 Text(
-                    text = state.number1 + (state.operation?.symbol ?: "") + state.number2,
+                    text = buildDisplayText(state.value),
                     textAlign = TextAlign.End,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 32.dp),
-                    fontSize = 36.sp,
+                    fontSize = if (buildDisplayText(state.value).length > 10) 28.sp else 36.sp,
                     color = Color.White,
-                    maxLines = 2
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 // Additional Buttons Row: √, π, ^, !
@@ -82,16 +105,16 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(buttonSpacing)
                 ) {
-                    CalculatorButton("√", LightGray, Modifier.weight(1f), isShaped = false) {
+                    CalculatorButton("√", MediumGray, Modifier.weight(1f), isShaped = false) {
                         onAction(CalculatorActions.Operations(CalculatorOperations.SquareRoot))
                     }
-                    CalculatorButton("π", LightGray, Modifier.weight(1f), isShaped = false) {
+                    CalculatorButton("π", MediumGray, Modifier.weight(1f), isShaped = false) {
                         onAction(CalculatorActions.Pi)
                     }
-                    CalculatorButton("^", LightGray, Modifier.weight(1f), isShaped = false) {
+                    CalculatorButton("^", MediumGray, Modifier.weight(1f), isShaped = false) {
                         onAction(CalculatorActions.Operations(CalculatorOperations.Power))
                     }
-                    CalculatorButton("!", LightGray, Modifier.weight(1f), isShaped = false) {
+                    CalculatorButton("!", MediumGray, Modifier.weight(1f), isShaped = false) {
                         onAction(CalculatorActions.Operations(CalculatorOperations.Factorial))
                     }
                 }
@@ -101,17 +124,17 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(buttonSpacing)
                 ) {
-                    CalculatorButton("AC", LightGray, Modifier.weight(1f)) {
+                    CalculatorButton("AC", Blue, Modifier.weight(1f)) {
                         onAction(
                             CalculatorActions.Clear
                         )
                     }
-                    CalculatorButton("Del", LightGray, Modifier.weight(1f)) {
+                    CalculatorButton("Del", Blue, Modifier.weight(1f)) {
                         onAction(
                             CalculatorActions.Delete
                         )
                     }
-                    CalculatorButton("%", LightGray, Modifier.weight(1f)) {
+                    CalculatorButton("%", Blue, Modifier.weight(1f)) {
                         onAction(
                             CalculatorActions.Percentage
                         )
@@ -149,31 +172,23 @@ class MainActivity : ComponentActivity() {
                         Modifier.weight(1f)
                     ) { onAction(CalculatorActions.Operations(CalculatorOperations.Multiply)) }
                 }
-
-                // Third Row: 4, 5, 6, -
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(buttonSpacing)
                 ) {
                     CalculatorButton("4", MediumGray, Modifier.weight(1f)) {
-                        onAction(
-                            CalculatorActions.Number(4)
-                        )
+                        onAction(CalculatorActions.Number(4))
                     }
                     CalculatorButton("5", MediumGray, Modifier.weight(1f)) {
-                        onAction(
-                            CalculatorActions.Number(5)
-                        )
+                        onAction(CalculatorActions.Number(5))
                     }
                     CalculatorButton("6", MediumGray, Modifier.weight(1f)) {
-                        onAction(
-                            CalculatorActions.Number(6)
-                        )
+                        onAction(CalculatorActions.Number(6))
                     }
                     CalculatorButton(
                         "-",
                         Blue,
-                        Modifier.weight(1f)
+                        Modifier.weight(1f) // Fixed: Added closing parenthesis
                     ) { onAction(CalculatorActions.Operations(CalculatorOperations.Subtract)) }
                 }
 
@@ -209,12 +224,12 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(buttonSpacing)
                 ) {
-                    CalculatorButton("0", MediumGray, Modifier.weight(1f) ,isSmall=true) {
+                    CalculatorButton("0", MediumGray, Modifier.weight(1f), isSmall = true) {
                         onAction(
                             CalculatorActions.Number(0)
                         )
                     }
-                    CalculatorButton(".", MediumGray, Modifier.weight(1f),isSmall=true) {
+                    CalculatorButton(".", MediumGray, Modifier.weight(1f), isSmall = true) {
                         onAction(
                             CalculatorActions.Decimal
                         )
@@ -223,7 +238,7 @@ class MainActivity : ComponentActivity() {
                         "=",
                         Blue,
                         Modifier.weight(1f),
-                        isSmall=true
+                        isSmall = true
                     ) { onAction(CalculatorActions.Calculate) }
                 }
             }
@@ -236,16 +251,20 @@ class MainActivity : ComponentActivity() {
         color: Color,
         modifier: Modifier = Modifier,
         isShaped: Boolean = true,
-        isSmall:Boolean=false,
+        isSmall: Boolean = false,
         onClick: () -> Unit
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = modifier
-                .aspectRatio(if(isSmall)1.5f else 1f )
+                .aspectRatio(if (isSmall) 1.5f else 1f)
                 .clip(if (isShaped) CircleShape else MaterialTheme.shapes.medium)
                 .background(color)
-                .clickable { onClick() }
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = LocalIndication.current
+                ) { onClick() }
+                .semantics { contentDescription = symbol }
         ) {
             Text(
                 text = symbol,
@@ -256,4 +275,15 @@ class MainActivity : ComponentActivity() {
             )
         }
     }
+
+    private fun buildDisplayText(state: CalculatorStates): String {
+        return when {
+            state.currentInput.isNotBlank() -> state.currentInput
+            state.number.isNotEmpty() -> state.number.last()
+            else -> "0"
+
+        }
+    }
 }
+
+

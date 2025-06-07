@@ -13,9 +13,9 @@ sealed class CalculatorActions {
 
 
     object Pi: CalculatorActions()
-    object Percentage : CalculatorActions() {
+    object Percentage : CalculatorActions()
 
-    }
+
 
     data class Operations(val operation:CalculatorOperations):CalculatorActions()
 }

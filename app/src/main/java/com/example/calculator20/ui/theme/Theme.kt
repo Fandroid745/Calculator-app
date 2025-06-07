@@ -6,6 +6,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColorScheme(
@@ -31,10 +32,11 @@ fun Calculator20Theme(
         LightColorPalette
     }
 
-    MaterialTheme(
-        colorScheme = colors,
-        typography = Typography,
-        shapes = AppShapes,
-        content = content
-    )
+        MaterialTheme(
+            colorScheme = colors,
+            typography = Typography,
+            shapes = AppShapes,
+            content = content
+        )
+
 }

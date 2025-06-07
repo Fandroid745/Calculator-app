@@ -15,5 +15,5 @@ sealed class CalculatorOperations(val symbol: String) {
     object SquareRoot : CalculatorOperations("√") // Square root
 
 
-    object Factorial : CalculatorOperations("!") // Factorial
+    object Factorial : CalculatorOperations("!")
 }
